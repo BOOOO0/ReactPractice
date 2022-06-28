@@ -34,6 +34,8 @@ const areEqual = (prevProps, nextProps) => {
   //   return false;
   return prevProps.obj.count === nextProps.obj.count;
 };
+// areEqual을 사용해서 CounterB의 obj의 값을 비교해서 True 라면 render하지 않는다
+// NemoizedCounterB에는 Props로 아래에서 obj를 전달
 const MemoizedCounterB = React.memo(CounterB, areEqual);
 const OptimizeTest = () => {
   const [count, setCount] = useState(1);
