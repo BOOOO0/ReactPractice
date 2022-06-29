@@ -1,6 +1,10 @@
-import React, { useRef, useState } from "react";
-
+import React, { useEffect, useRef, useState } from "react";
+//onCreate가 app 컴포넌트가 rendering 될 때 마다 같이 rendering됨
 const DiaryEditor = ({ onCreate }) => {
+  useEffect(() => {
+    //onCreate가 app 컴포넌트가 rendering 될 때 마다 같이 rendering됨
+    console.log("DiaryEditor 렌더링");
+  });
   const authorInput = useRef();
   const contentInput = useRef();
   const [state, setState] = useState({
@@ -72,4 +76,4 @@ const DiaryEditor = ({ onCreate }) => {
   );
 };
 
-export default DiaryEditor;
+export default React.memo(DiaryEditor);
