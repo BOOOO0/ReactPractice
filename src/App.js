@@ -48,17 +48,18 @@ function App() {
     //항상 최신의 data를 인자를 통해서 참조할 수 있다
     setData((data) => [newItem, ...data]);
   }, []);
-  const onRemove = (targetID) => {
-    const newDiaryList = data.filter((it) => it.id !== targetID);
-    setData(newDiaryList);
-  };
-  const onEdit = (targetID, newContent) => {
-    setData(
+  const onRemove = useCallback((targetID) => {
+    //const newDiaryList = data.filter((it) => it.id !== targetID);
+    //함수형 업데이트 지시
+    setData((data) => data.filter((it) => it.id !== targetID));
+  }, []);
+  const onEdit = useCallback((targetID, newContent) => {
+    setData((data) =>
       data.map((it) =>
         it.id === targetID ? { ...it, content: newContent } : it
       )
     );
-  };
+  }, []);
   const getDiaryAnalysis = useMemo(() => {
     const goodCount = data.filter((it) => it.emotion >= 3).length;
     const badCount = data.length - goodCount;
