@@ -39,9 +39,12 @@ const reducer = (state, action) => {
   }
 };
 
-const App = () => {
-  //const [data, setData] = useState([]);
+//export default는 하나만 쓸 수 있다. 그 외의 export const들은 비구조화 할당을 통해서만 받을 수 있다
+export const DiaryStateContext = React.createContext();
 
+export const DiaryDispatchContext = React.createContext();
+
+const App = () => {
   const [data, dispatch] = useReducer(reducer, []);
   const dataId = useRef(0);
   // 호출 후 key값 id값이 지랄나는 이유
@@ -85,6 +88,11 @@ const App = () => {
   const onEdit = useCallback((targetID, newContent) => {
     dispatch({ type: "EDIT", targetID, newContent });
   }, []);
+
+  const memoizedDispatches = useMemo(() => {
+    return { onCreate, onRemove, onEdit };
+  }, []);
+
   const getDiaryAnalysis = useMemo(() => {
     const goodCount = data.filter((it) => it.emotion >= 3).length;
     const badCount = data.length - goodCount;
@@ -93,14 +101,18 @@ const App = () => {
   }, [data.length]);
   const { goodCount, badCount, goodRatio } = getDiaryAnalysis;
   return (
-    <div className="App">
-      <DiaryEditor onCreate={onCreate} />
-      <div>전체 일기 : {data.length}</div>
-      <div>기분 좋은 일기 개수 : {goodCount}</div>
-      <div>기분 나쁜 일기 개수 : {badCount}</div>
-      <div>기분 좋은 일기 비율 : {goodRatio}</div>
-      <DiaryList diaryList={data} onEdit={onEdit} onRemove={onRemove} />
-    </div>
+    <DiaryStateContext.Provider value={data}>
+      <DiaryDispatchContext.Provider value={memoizedDispatches}>
+        <div className="App">
+          <DiaryEditor onCreate={onCreate} />
+          <div>전체 일기 : {data.length}</div>
+          <div>기분 좋은 일기 개수 : {goodCount}</div>
+          <div>기분 나쁜 일기 개수 : {badCount}</div>
+          <div>기분 좋은 일기 비율 : {goodRatio}</div>
+          <DiaryList diaryList={data} onEdit={onEdit} onRemove={onRemove} />
+        </div>
+      </DiaryDispatchContext.Provider>
+    </DiaryStateContext.Provider>
   );
 };
 

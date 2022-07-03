@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { DiaryDispatchContext } from "./App";
 
-const DiaryEditor = ({ onCreate }) => {
+const DiaryEditor = () => {
+  const { onCreate } = useContext(DiaryDispatchContext);
   useEffect(() => {
     //onCreate가 app 컴포넌트가 rendering 될 때 마다 같이 rendering됨
     console.log("DiaryEditor 렌더링");
