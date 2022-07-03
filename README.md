@@ -6,4 +6,4 @@
 useCallback 적용
          
 2022 07 03                                                     
-useReducer 적용
+useReducer 적용, Context API를 사용한 Props Drilling 방지
