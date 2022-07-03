@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-//onCreate가 app 컴포넌트가 rendering 될 때 마다 같이 rendering됨
+
 const DiaryEditor = ({ onCreate }) => {
   useEffect(() => {
     //onCreate가 app 컴포넌트가 rendering 될 때 마다 같이 rendering됨

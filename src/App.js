@@ -5,12 +5,44 @@ import React, {
   useMemo,
   useEffect,
   useRef,
-  useState,
   useCallback,
+  useReducer,
 } from "react";
 
-function App() {
-  const [data, setData] = useState([]);
+const reducer = (state, action) => {
+  switch (action.type) {
+    //API에서 불러온 일기들을 리스트에 추가
+    case "INIT": {
+      return action.data;
+    }
+    //새로 작성된 일기를 리스트에 추가
+    case "CREATE": {
+      const created_date = new Date().getTime();
+      const newItem = {
+        ...action.data,
+        created_date,
+      };
+      return [newItem, ...state];
+    }
+    //리스트에 있는 일기를 삭제
+    case "REMOVE": {
+      return state.filter((it) => it.id !== action.targetID);
+    }
+    //리스트에 있는 일기를 수정
+    case "EDIT": {
+      return state.map((it) =>
+        it.id === action.targetID ? { ...it, content: action.newContent } : it
+      );
+    }
+    default:
+      return state;
+  }
+};
+
+const App = () => {
+  //const [data, setData] = useState([]);
+
+  const [data, dispatch] = useReducer(reducer, []);
   const dataId = useRef(0);
   // 호출 후 key값 id값이 지랄나는 이유
   // index.js 에서 React.StrcitMode가 렌더링을 두번씩 시켜서
@@ -28,37 +60,30 @@ function App() {
         id: dataId.current++,
       };
     });
-    setData(initData);
+    dispatch({ type: "INIT", data: initData });
   };
   useEffect(() => {
     getData();
   }, []);
   // DiaryEditor의 불필요한 렌더링을 방지하기 위해서 onCreate함수 최적화
   const onCreate = useCallback((author, content, emotion) => {
-    const created_date = new Date().getTime();
-    const newItem = {
-      author,
-      content,
-      emotion,
-      created_date,
-      id: dataId.current,
-    };
+    dispatch({
+      type: "CREATE",
+      data: { author, content, emotion, id: dataId.current },
+    });
+
     dataId.current += 1;
     //함수형 전달
     //항상 최신의 data를 인자를 통해서 참조할 수 있다
-    setData((data) => [newItem, ...data]);
   }, []);
   const onRemove = useCallback((targetID) => {
+    //기존의 newDiaryList를 return하던 방식도 없애고
     //const newDiaryList = data.filter((it) => it.id !== targetID);
     //함수형 업데이트 지시
-    setData((data) => data.filter((it) => it.id !== targetID));
+    dispatch({ type: "REMOVE", targetID });
   }, []);
   const onEdit = useCallback((targetID, newContent) => {
-    setData((data) =>
-      data.map((it) =>
-        it.id === targetID ? { ...it, content: newContent } : it
-      )
-    );
+    dispatch({ type: "EDIT", targetID, newContent });
   }, []);
   const getDiaryAnalysis = useMemo(() => {
     const goodCount = data.filter((it) => it.emotion >= 3).length;
@@ -77,6 +102,6 @@ function App() {
       <DiaryList diaryList={data} onEdit={onEdit} onRemove={onRemove} />
     </div>
   );
-}
+};
 
 export default App;
